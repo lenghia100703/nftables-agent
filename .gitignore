@@ -1,2 +1,18 @@
-venv
-.venv
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+
+# Logs
+*.log
+
+# IDE
+.idea/
+.vscode/
+
+# System
+.DS_Store
