@@ -17,10 +17,12 @@ class RabbitMQ:
 
     def start_consuming(self):
         def callback(ch, method, properties, body):
+            routing_key = method.routing_key
             command = body.decode()
             logger.info(f"[x] Received: {command}")
-            result = self.execute_shell_command_linux(command)
-            self.send_result_to_producer(result, settings.AGENT_IP)
+            if routing_key.startswith("command."):
+                result = self.execute_shell_command_linux(command)
+                self.send_result_to_producer(result, settings.AGENT_IP)
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
         self.channel.basic_consume(queue=self.queue, on_message_callback=callback)
@@ -34,7 +36,7 @@ class RabbitMQ:
                 ["/bin/bash", "-c", command],
                 capture_output=True,
                 text=True,
-                timeout=30
+                timeout=10
             )
             if completed.returncode != 0:
                 logger.error(f"[!] Shell command failed: {completed.stderr}")
@@ -57,7 +59,7 @@ class RabbitMQ:
             if completed.returncode != 0:
                 logger.error(f"Windows command failed: {completed.stderr}")
                 return completed.stderr
-            print(completed.stdout)
+            logger.info(f"[✓] {completed.stdout}")
             return completed.stdout
         except subprocess.TimeoutExpired:
             logger.warning("[!] Windows command timed out.")
