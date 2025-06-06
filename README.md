@@ -34,7 +34,11 @@ Then you edit the `.env` file with the appropriate parameters:
 
 - Run script setup
 ```
-sudo ./deploy/install.sh
+chmod +x deploy/install.sh
+```
+
+```
+sudo deploy/install.sh
 ```
 3. Agent actions:
 - Check status
